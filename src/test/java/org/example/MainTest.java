@@ -1,6 +1,5 @@
 package org.example;
 
-import org.apache.commons.lang3.Functions;
 import org.apache.spark.ml.classification.NaiveBayes;
 import org.apache.spark.ml.classification.NaiveBayesModel;
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator;
@@ -8,19 +7,20 @@ import org.apache.spark.ml.feature.HashingTF;
 import org.apache.spark.ml.feature.Tokenizer;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.api.java.UDF1;
-import org.apache.spark.sql.functions.*;
 import org.apache.spark.sql.types.DataTypes;
+import org.junit.Test;
 
 
-public class Main {
-    public static UDF1<String, String> porterStemmer() {
+public class MainTest {
+    public UDF1<String, String> porterStemmer() {
         return (value) -> PorterStemmer.stem(
                     value.toLowerCase()
                         .replaceAll("[\\pP\\d\\n\\t\\r$+<>№=]", " ")
                         .replaceAll("  ", " "));
     }
 
-    public static void main(String[] args) {
+    @Test
+    public void main_test() {
         SparkSession spark = SparkSession.builder()
                 .appName("App1")
                 .config("spark.eventLog.enabled", "false")
