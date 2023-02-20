@@ -1,5 +1,7 @@
 package org.example;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.apache.spark.ml.classification.NaiveBayes;
 import org.apache.spark.ml.classification.NaiveBayesModel;
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator;
@@ -8,10 +10,23 @@ import org.apache.spark.ml.feature.Tokenizer;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.types.DataTypes;
+import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 public class MainTest {
+    @Before
+    public void setUp() {
+        final Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        logger.setLevel(Level.ERROR);
+    }
+
     public UDF1<String, String> porterStemmer() {
         return (value) -> PorterStemmer.stem(
                     value.toLowerCase()
@@ -20,7 +35,7 @@ public class MainTest {
     }
 
     @Test
-    public void main_test() {
+    public void main_test() throws IOException {
         SparkSession spark = SparkSession.builder()
                 .appName("App1")
                 .config("spark.eventLog.enabled", "false")
@@ -29,7 +44,7 @@ public class MainTest {
         spark.sparkContext().setLogLevel("ERROR");
         spark.sqlContext().udf().register("porterStemmer", porterStemmer(), DataTypes.StringType);
         // Загрузка тренировочных данных
-        Dataset<Row> df = spark.read().option("header", true).csv("src/main/resources/test_data.csv");
+        Dataset<Row> df = spark.read().option("header", true).csv("src/test/resources/test_data.csv");
         // Преобразуем label к double
         df = df.withColumn("label", new Column("label").cast("double"));
         df.show();
@@ -67,6 +82,20 @@ public class MainTest {
                 .setMetricName("accuracy");
         double accuracy = evaluator.evaluate(predictions);
         System.out.println("Test set accuracy = " + accuracy);
+        // Сохранение обученной модели
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(Paths.get("data/model.ser")))) {
+            oos.writeObject(model);
+        }
+        // Загрузка модели
+        NaiveBayesModel model1;
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(Paths.get("data/model.ser")))) {
+            model1 = (NaiveBayesModel) ois.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        // Прогонка загруженной модели на тестовых данных
+        Dataset<Row> predictions1 = model1.transform(test);
+        predictions1.show();
         spark.stop();
     }
 }
