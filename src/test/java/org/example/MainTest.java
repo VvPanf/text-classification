@@ -2,11 +2,14 @@ package org.example;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import org.apache.spark.ml.Pipeline;
+import org.apache.spark.ml.PipelineModel;
+import org.apache.spark.ml.PipelineStage;
+import org.apache.spark.ml.classification.LogisticRegression;
 import org.apache.spark.ml.classification.NaiveBayes;
 import org.apache.spark.ml.classification.NaiveBayesModel;
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator;
-import org.apache.spark.ml.feature.HashingTF;
-import org.apache.spark.ml.feature.Tokenizer;
+import org.apache.spark.ml.feature.*;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.types.DataTypes;
@@ -51,7 +54,7 @@ public class MainTest {
         // Удаление цифр и других лишних знаков
         df = df.withColumn("sentence", functions.callUDF("porterStemmer", df.col("sentence")));
         df.show(false);
-        // Разбиение предлодений на слова
+        // Разбиение предложений на слова
         df = new Tokenizer()
                 .setInputCol("sentence")
                 .setOutputCol("words")
@@ -97,5 +100,74 @@ public class MainTest {
         Dataset<Row> predictions1 = model1.transform(test);
         predictions1.show();
         spark.stop();
+    }
+
+    @Test
+    public void test_bbc() {
+        SparkSession spark = SparkSession.builder()
+                .appName("App1")
+                .config("spark.eventLog.enabled", "false")
+                .master("local[1]")
+                .getOrCreate();
+        spark.sparkContext().setLogLevel("ERROR");
+        spark.sqlContext().udf().register("porterStemmer", porterStemmer(), DataTypes.StringType);
+        // Загрузка тренировочных данных
+        Dataset<Row> df = spark.read().option("header", true).csv("src/test/resources/bbc-text.csv");
+        df = df.withColumn("text", functions.callUDF("porterStemmer", df.col("text")));
+//        df.show(5);
+        // Разбиение данныз на тренировочную и тестовую выборки
+        Dataset<Row>[] splits = df.randomSplit(new double[]{0.7, 0.3}, 1234L);
+        Dataset<Row> train = splits[0];
+        Dataset<Row> test = splits[1];
+
+        // ПОДГОТОВКА ШАГОВ ПО ОБРАБОТКЕ ДАННЫХ
+        // Разбиение предложений на слова
+        Tokenizer tokenizer = new Tokenizer()
+                .setInputCol("text")
+                .setOutputCol("words");
+        // Удаление стоп-слов
+        StopWordsRemover stopWordsRemover = new StopWordsRemover()
+                .setInputCol("words")
+                .setOutputCol("cleanTokens");
+        // Выделение токенов слов
+        HashingTF hashingTF = new HashingTF()
+                .setInputCol("cleanTokens")
+                .setOutputCol("features")
+                .setNumFeatures(1000);
+        // Преобразование метки (строки) в целое число
+        StringIndexer stringIndexer = new StringIndexer()
+                .setInputCol("category")
+                .setOutputCol("label");
+        // Создание наивного байеса
+        NaiveBayes naiveBayes = new NaiveBayes();
+        // Создание регресии
+        LogisticRegression logisticRegression = new LogisticRegression()
+                .setMaxIter(10)
+                .setRegParam(0.3)
+                .setElasticNetParam(0);
+        // Преобразование индекса к метке класса
+        IndexToString indexToStringExp = new IndexToString()
+                .setInputCol("label")
+                .setOutputCol("expected");
+        // Конвеер по обработке данных
+        Pipeline pipeline = new Pipeline()
+                .setStages(new PipelineStage[]{
+                        tokenizer,
+                        stopWordsRemover,
+                        hashingTF,
+                        stringIndexer,
+                        logisticRegression,
+                        indexToStringExp
+                });
+        PipelineModel model = pipeline.fit(train);
+        Dataset<Row> predictions = model.transform(test);
+        predictions.show(100);
+        // Вычисление точности на тестовом наборе
+        MulticlassClassificationEvaluator evaluator = new MulticlassClassificationEvaluator()
+                .setLabelCol("label")
+                .setPredictionCol("prediction")
+                .setMetricName("accuracy");
+        double accuracy = evaluator.evaluate(predictions);
+        System.out.println("Test set accuracy = " + accuracy);
     }
 }
