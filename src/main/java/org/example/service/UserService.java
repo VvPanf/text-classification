@@ -16,11 +16,11 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        userRepo.save(new User("admin", "admin", Role.ROLE_ADMIN));
 //        userRepo.save(new User("user", "user"));
         User user = userRepo.findByUsername(username);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found!");
+            user = userRepo.save(new User("admin", "admin", Role.ROLE_ADMIN));
+//            throw new UsernameNotFoundException("User not found!");
         }
         return user;
     }
