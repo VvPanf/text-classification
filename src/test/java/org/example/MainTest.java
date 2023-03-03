@@ -17,9 +17,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
@@ -34,7 +35,7 @@ public class MainTest {
         return (value) -> PorterStemmer.stem(
                     value.toLowerCase()
                         .replaceAll("[\\pP\\d\\n\\t\\r$+<>№=]", " ")
-                        .replaceAll("  ", " "));
+                        .replaceAll(" +", " "));
     }
 
     @Test
@@ -112,7 +113,7 @@ public class MainTest {
         spark.sparkContext().setLogLevel("ERROR");
         spark.sqlContext().udf().register("porterStemmer", porterStemmer(), DataTypes.StringType);
         // Загрузка тренировочных данных
-        Dataset<Row> df = spark.read().option("header", true).csv("src/test/resources/bbc-text.csv");
+        Dataset<Row> df = spark.read().option("header", true).option("delimiter", ";").csv("src/test/resources/text-data.csv");
         df = df.withColumn("text", functions.callUDF("porterStemmer", df.col("text")));
 //        df.show(5);
         // Разбиение данныз на тренировочную и тестовую выборки
@@ -161,7 +162,7 @@ public class MainTest {
                 });
         PipelineModel model = pipeline.fit(train);
         Dataset<Row> predictions = model.transform(test);
-        predictions.show(100);
+        predictions.show(20);
         // Вычисление точности на тестовом наборе
         MulticlassClassificationEvaluator evaluator = new MulticlassClassificationEvaluator()
                 .setLabelCol("label")
