@@ -4,14 +4,13 @@
     <div class="wrapper_admin">
     <span class ="icon-close"> <ion-icon name="close"></ion-icon> </span>
         <div class="admin_text">
-            <h2> Журнал инцидентов </h2>
+            <h2> Мои инциденты </h2>
 
         <div class="admin_table">
              <table class="table table-hover">
                 <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Дата запроса</th>
-                    <th scope="col">Пользователь</th>
                     <th scope="col">Заголовок запроса</th>
                     <th scope="col">Содержание запроса</th>
                     <th scope="col">Рабочая группа</th>
@@ -22,14 +21,13 @@
                         <tr>
                             <th scope="row">${incident.id}</th>
                             <td>${incident.timestamp}</td>
-                            <td>${incident.user.username}</td>
                             <td>${incident.title}</td>
                             <td>${incident.text}</td>
                         </tr>
                     </#list>
                 <#else>
                     <tr>
-                        <td scope="row" colspan="7">Список запросов пуст</td>
+                        <td scope="row" colspan="6">Список запросов пуст</td>
                     </tr>
                 </#if>
             </table>

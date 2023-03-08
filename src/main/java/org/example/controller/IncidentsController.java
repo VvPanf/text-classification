@@ -13,17 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin")
-public class AdminController {
+@RequestMapping("/incidents")
+public class IncidentsController {
     @Autowired
     private IncidentRepo incidentRepo;
 
     @GetMapping
-    public String getAdmin(@AuthenticationPrincipal User user,
+    public String getIncidents(@AuthenticationPrincipal User user,
                              Model model) {
-        List<Incident> incidents = incidentRepo.findAll();
+        List<Incident> incidents = incidentRepo.findByUser(user);
         model.addAttribute("incidents", incidents);
-        model.addAttribute("user", user);
-        return "admin";
+        return "incidents";
     }
 }

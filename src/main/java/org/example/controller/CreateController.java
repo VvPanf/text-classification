@@ -18,20 +18,20 @@ import java.util.Date;
 import java.util.List;
 
 @Controller
-@RequestMapping("/")
-public class MainController {
+@RequestMapping("/create")
+public class CreateController {
     @Autowired
     private IncidentRepo incidentRepo;
 
     @GetMapping
-    public String getMessage(@AuthenticationPrincipal User user,    // Информация о пользователе с формы
+    public String getCreate(@AuthenticationPrincipal User user,    // Информация о пользователе с формы
                              Model model) {                         // Модель для установки в неё параметров
         model.addAttribute("user", user);
-        return "index";
+        return "create";
     }
 
     @PostMapping
-    public String postMessage(@AuthenticationPrincipal User user,   // Информация о пользователе с формы
+    public String postCreate(@AuthenticationPrincipal User user,   // Информация о пользователе с формы
                               @Valid Incident incident,             // Инцедент с формы
                               BindingResult bindingResult,          // Информация о прохождении валидации полей с формы
                               Model model) {                        // Модель для установки в неё параметров
@@ -50,6 +50,6 @@ public class MainController {
             model.addAttribute("incidents", incidents);
         }
         model.addAttribute("user", user);
-        return "index";
+        return "create";
     }
 }
