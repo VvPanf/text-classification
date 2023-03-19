@@ -1,6 +1,5 @@
 package org.example.service;
 
-import org.example.model.Role;
 import org.example.model.User;
 import org.example.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +15,9 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        userRepo.save(new User("user", "user"));
         User user = userRepo.findByUsername(username);
         if (user == null) {
-            user = userRepo.save(new User("admin", "admin", Role.ROLE_ADMIN));
-//            throw new UsernameNotFoundException("User not found!");
+            throw new UsernameNotFoundException("User not found!");
         }
         return user;
     }

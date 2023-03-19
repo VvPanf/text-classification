@@ -25,6 +25,8 @@
                             <td>${incident.user.username}</td>
                             <td>${incident.title}</td>
                             <td>${incident.text}</td>
+                            <td>${incident.workGroup}</td>
+                            <td>${incident.status}</td>
                         </tr>
                     </#list>
                 <#else>

@@ -17,6 +17,8 @@ public class Incident {
     @Size(max=1024)
     private String text;
     private Timestamp timestamp;
+    private String workGroup;
+    private String status;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -24,10 +26,13 @@ public class Incident {
     public Incident() {
     }
 
-    public Incident(String title, String text, Timestamp timestamp, User user) {
+    public Incident(Long id, String title, String text, Timestamp timestamp, String workGroup, String status, User user) {
+        this.id = id;
         this.title = title;
         this.text = text;
         this.timestamp = timestamp;
+        this.workGroup = workGroup;
+        this.status = status;
         this.user = user;
     }
 
@@ -61,6 +66,22 @@ public class Incident {
 
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getWorkGroup() {
+        return workGroup;
+    }
+
+    public void setWorkGroup(String workGroup) {
+        this.workGroup = workGroup;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public User getUser() {
