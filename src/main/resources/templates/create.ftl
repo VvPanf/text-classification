@@ -14,11 +14,22 @@
             </#list>
         </#if>
         </div>
+
             <div class="input-box-in">
-        <input class="form-control" type="text" placeholder="Введите заголовок обращения..." name="title" value="${(inputIncident.title)!''}">
+                <input class="form-control" type="text" placeholder="Введите заголовок обращения..." name="title" value="${(inputIncident.title)!''}">
             </div>
-            <div class="text-box-in">
-        <textarea class="form-control" rows=7 placeholder="Введите текст обращения..." name="text">${(inputIncident.text)!''}</textarea>
+<!--        <div class="input-box-in">-->
+<!--            <input class="form-control" type="text" placeholder="Введите контактное лицо..." name="title" value="${(inputIncident.title)!''}">-->
+<!--        </div>-->
+<!--        <div class="input-box-in">-->
+<!--            <input class="form-control" type="text" placeholder="Укажите срочность" name="title" value="${(inputIncident.title)!''}">-->
+<!--        </div>-->
+<!--        <div class="input-box-in">-->
+<!--            <input class="form-control" type="text" placeholder="Укажите подразделение исполнителя..." name="title" value="${(inputIncident.title)!''}">-->
+<!--        </div>-->
+
+        <div class="text-box-in">
+        <textarea class="form-control" rows=8 placeholder="Введите текст обращения..." name="text">${(inputIncident.text)!''}</textarea>
 <!--        <input type="file" name="file">-->
             </div>
             <div class="buttonSend">
@@ -26,20 +37,6 @@
             </div>
             <input type="hidden" name="_csrf" value="${_csrf.token}" />
 
-    <div class="bot-box">
-    <#if incidents??>
-        <h3>Ваши заявки</h3>
-        <#list incidents as incident>
-            <textarea class="form-control" disabled>
-                ${incident.title}
-                ${incident.text}
-                ${incident.timestamp}
-            </textarea>
-        </#list>
-    <#else>
-        <h3>У вас пока нет отправленных заявок.</h3>
-    </#if>
-    </div>
     </form>
 </div>
 </@c.page>

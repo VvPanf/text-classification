@@ -9,13 +9,16 @@
     </head>
     <body>
         <header>
+            <div class = "logo_img">
+                <ion-icon name="logo-gitlab"></ion-icon>
+            </div>
             <h2 class="logo">Service desk</h2>
             <nav class="navigation">
                 <a href="/">Главная</a>
                 <a href="/create">Создать инцидент</a>
                 <a href="/incidents">Мой список инцидентов</a>
                 <#if user?? && user.isAdmin()>
-                    <a href="/admin">Для разработчика</a>
+                    <a href="/admin">Управление инцидентами</a>
                 </#if>
                     <a href="/about">О нас</a>
                 <#if user??>
@@ -40,6 +43,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script src="static/script.js"/>
     </body>
     </html>
 </#macro>

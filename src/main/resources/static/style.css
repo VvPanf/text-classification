@@ -26,6 +26,7 @@ header {
     left: 0;
     width: 100%;
     padding: 20px 80px;
+    background: rgba(0,0,0, .5);
     backdrop-filter:  blur(40px);
     display: flex;
     justify-content: space-between;
@@ -33,9 +34,24 @@ header {
     z-index: 99;
 }
 .logo {
+    position: relative;
     font-size: 2em;
+    text-transform: uppercase;
+
     color: #d3f1fc;
     user-select: none;
+    margin-left: 10px;
+}
+
+.logo_img {
+    position: fixed;
+    background: transparent;
+    font-size: 3em;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px #0ef;
+    color: #d3f1fc;
+    user-select: none;
+    left: 20px;
 }
 
 .navigation {
@@ -53,6 +69,7 @@ header {
     font-weight: 500;
     margin-left: 40px;
 }
+
 .navigation a::after {
     content: '';
     position: absolute;
@@ -77,6 +94,7 @@ header {
     background: transparent;
     border: 2px solid #d3f1fc;
     outline: none;
+    box-shadow: 0 0 10px #0ef;
     border-radius: 6px;
     cursor: pointer;
     font-size: 1.1em;
@@ -157,7 +175,7 @@ header {
 }
 
 .input-box .icon {
-   position: absolute;
+    position: absolute;
     right: 8px;
     font-size: 1.2em;
     color: #162938;
@@ -219,9 +237,10 @@ header {
 
 
 .wrapper_index {
-    position: relative;
-    width: 750px;
-    height: 550px;
+    position: absolute;
+    top: 15%;
+    width: 850px;
+    height: 650px;
     background-color:  rgba(255, 255, 255, 0.9);
     border: 2px solid #d3f1fc;
     border-radius: 20px;
@@ -250,11 +269,13 @@ header {
 }
 
 .wrapper_index .form-box-in {
+
     width: 100%;
     padding: 10px;
 }
 
 .form-box-in h2 {
+
     font-size: 2em;
     color: #162938;
     text-align: center;
@@ -263,9 +284,9 @@ header {
 .input-box-in {
     position: relative;
     width: 100%;
-    height: 50px;
+    height: 40px;
     border-bottom: 2px solid #162938;
-    margin: 30px 0;
+    margin: 20px 0;
 }
 
 
@@ -416,7 +437,7 @@ header {
 .admin_text h2 {
 
     font-size: 2em;
-    color: #162938;
+    color: black;
     text-align: center;
 
 }
@@ -428,4 +449,83 @@ header {
     margin: 30px 0;
 }
 
+
+.sidebar {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    width: 290px;
+    height: 100%;
+    background: rgba(0,0,0, .5);
+    backdrop-filter:  blur(25px);
+    border-right: 2px solid #d3f1fc;
+    box-shadow: 0 0 10px #0ef;
+    padding: 6px 14px;
+}
+
+.sidebar ul {
+    margin-top: 20px;
+}
+
+.sidebar ul li {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    list-style: none;
+    margin: 5px 0;
+    line-height: 50px;
+}
+
+.sidebar ul li a {
+    display: flex;
+    align-items: center;
+    color: #d3f1fc;
+    text-decoration: none;
+    transition: 0.5s ease;
+    border-radius: 6px;
+}
+.sidebar ul li a:hover {
+    background: rgba(255,255,255, 0.1);
+}
+
+.sidebar ul li ion-icon{
+    min-width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    margin-right: 10px;
+}
+
+.wrapper_admin_full {
+    position: relative;
+    width: 1150px;
+    height: 620px;
+    background-color:  rgba(255, 255, 255, 0.75);
+    border: 2px solid #d3f1fc;
+    border-radius: 10px;
+    backdrop-filter:  blur(10px);
+    box-shadow: 0 0 30px rgba(0, 0, 0, .5);
+    display: flex;
+    margin-left: 17%;
+    margin-top: 5%;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.wrapper_admin_full .icon-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 45px;
+    height: 45px;
+    font-size: 2em;
+    background: #162938;
+    color: #d3f1fc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom-left-radius: 20px;
+    cursor: pointer;
+}
 

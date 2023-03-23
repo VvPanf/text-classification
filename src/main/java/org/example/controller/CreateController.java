@@ -44,6 +44,8 @@ public class CreateController {
             long currentDateTime = new Date().getTime();
             incident.setTimestamp(new Timestamp(currentDateTime));
             incident.setUser(user);
+            incident.setWorkGroup("Не определена");
+            incident.setStatus("Распределение");
             incidentRepo.save(incident);
             // Выводим список всех инцедентов
             List<Incident> incidents = incidentRepo.findByUser(user);

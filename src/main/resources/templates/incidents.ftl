@@ -19,12 +19,12 @@
                 <#if incidents?has_content>
                     <#list incidents as incident>
                         <tr>
-                            <th scope="row">${incident.id}</th>
-                            <td>${incident.timestamp}</td>
-                            <td>${incident.title}</td>
-                            <td>${incident.text}</td>
-                            <td>${incident.workGroup}</td>
-                            <td>${incident.status}</td>
+                            <th scope="row">${incident.id!""}</th>
+                            <td>${incident.timestamp!""}</td>
+                            <td>${incident.title!""}</td>
+                            <td>${incident.text!""}</td>
+                            <td>${incident.workGroup!""}</td>
+                            <td>${incident.status!""}</td>
                         </tr>
                     </#list>
                 <#else>

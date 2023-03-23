@@ -23,6 +23,7 @@ public class IncidentsController {
                              Model model) {
         List<Incident> incidents = incidentRepo.findByUser(user);
         model.addAttribute("incidents", incidents);
+        model.addAttribute("user", user);
         return "incidents";
     }
 }
