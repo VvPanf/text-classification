@@ -5,14 +5,21 @@ import ch.qos.logback.classic.Logger;
 import org.apache.spark.ml.Pipeline;
 import org.apache.spark.ml.PipelineModel;
 import org.apache.spark.ml.PipelineStage;
+import org.apache.spark.ml.Transformer;
 import org.apache.spark.ml.classification.LogisticRegression;
 import org.apache.spark.ml.classification.NaiveBayes;
 import org.apache.spark.ml.classification.NaiveBayesModel;
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator;
-import org.apache.spark.ml.feature.*;
+import org.apache.spark.ml.feature.HashingTF;
+import org.apache.spark.ml.feature.StopWordsRemover;
+import org.apache.spark.ml.feature.StringIndexer;
+import org.apache.spark.ml.feature.Tokenizer;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
@@ -22,6 +29,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 public class MainTest {
@@ -38,8 +50,7 @@ public class MainTest {
                         .replaceAll(" +", " "));
     }
 
-    @Test
-    public void main_test() throws IOException {
+    private SparkSession createSparkSession() {
         SparkSession spark = SparkSession.builder()
                 .appName("App1")
                 .config("spark.eventLog.enabled", "false")
@@ -47,6 +58,12 @@ public class MainTest {
                 .getOrCreate();
         spark.sparkContext().setLogLevel("ERROR");
         spark.sqlContext().udf().register("porterStemmer", porterStemmer(), DataTypes.StringType);
+        return spark;
+    }
+
+    @Test
+    public void main_test() throws IOException {
+        SparkSession spark = createSparkSession();
         // Загрузка тренировочных данных
         Dataset<Row> df = spark.read().option("header", true).csv("src/test/resources/test_data.csv");
         // Преобразуем label к double
@@ -104,14 +121,8 @@ public class MainTest {
     }
 
     @Test
-    public void test_bbc() {
-        SparkSession spark = SparkSession.builder()
-                .appName("App1")
-                .config("spark.eventLog.enabled", "false")
-                .master("local[1]")
-                .getOrCreate();
-        spark.sparkContext().setLogLevel("ERROR");
-        spark.sqlContext().udf().register("porterStemmer", porterStemmer(), DataTypes.StringType);
+    public void test_bbc() throws IOException {
+        SparkSession spark = createSparkSession();
         // Загрузка тренировочных данных
         Dataset<Row> df = spark.read().option("header", true).option("delimiter", ";").csv("src/test/resources/text-data.csv");
         df = df.withColumn("text", functions.callUDF("porterStemmer", df.col("text")));
@@ -122,6 +133,10 @@ public class MainTest {
         Dataset<Row> test = splits[1];
 
         // ПОДГОТОВКА ШАГОВ ПО ОБРАБОТКЕ ДАННЫХ
+        // Преобразование метки (строки) в целое число
+        StringIndexer stringIndexer = new StringIndexer()
+                .setInputCol("category")
+                .setOutputCol("label");
         // Разбиение предложений на слова
         Tokenizer tokenizer = new Tokenizer()
                 .setInputCol("text")
@@ -135,10 +150,6 @@ public class MainTest {
                 .setInputCol("cleanTokens")
                 .setOutputCol("features")
                 .setNumFeatures(1000);
-        // Преобразование метки (строки) в целое число
-        StringIndexer stringIndexer = new StringIndexer()
-                .setInputCol("category")
-                .setOutputCol("label");
         // Создание наивного байеса
         NaiveBayes naiveBayes = new NaiveBayes();
         // Создание регресии
@@ -146,23 +157,23 @@ public class MainTest {
                 .setMaxIter(10)
                 .setRegParam(0.3)
                 .setElasticNetParam(0);
-        // Преобразование индекса к метке класса
-        IndexToString indexToStringExp = new IndexToString()
-                .setInputCol("label")
-                .setOutputCol("expected");
+//        // Преобразование индекса к метке класса
+//        IndexToString indexToStringExp = new IndexToString()
+//                .setInputCol("label")
+//                .setOutputCol("expected");
         // Конвеер по обработке данных
         Pipeline pipeline = new Pipeline()
                 .setStages(new PipelineStage[]{
+                        stringIndexer,
                         tokenizer,
                         stopWordsRemover,
                         hashingTF,
-                        stringIndexer,
                         logisticRegression,
-                        indexToStringExp
+//                        indexToStringExp
                 });
         PipelineModel model = pipeline.fit(train);
         Dataset<Row> predictions = model.transform(test);
-        predictions.show(20);
+        predictions.show(200);
         // Вычисление точности на тестовом наборе
         MulticlassClassificationEvaluator evaluator = new MulticlassClassificationEvaluator()
                 .setLabelCol("label")
@@ -170,5 +181,42 @@ public class MainTest {
                 .setMetricName("accuracy");
         double accuracy = evaluator.evaluate(predictions);
         System.out.println("Test set accuracy = " + accuracy);
+        // Сохранение обученной модели только с необходимыми стадиями
+//        model.save("data/model");
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(Paths.get("data/pipeline_model.ser")))) {
+            List<Transformer> stages = Arrays.stream(model.stages()).skip(1).collect(Collectors.toList());
+            PipelineModel modelToSave = new PipelineModel(UUID.randomUUID().toString(), stages);
+            oos.writeObject(modelToSave);
+        }
+        spark.stop();
+    }
+
+    @Test
+    public void test_prediction() {
+        SparkSession spark = createSparkSession();
+        // Загрузка обученной модели из файла
+//        PipelineModel model = PipelineModel.load("data/model");
+        PipelineModel model;
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(Paths.get("data/pipeline_model.ser")))) {
+            model = (PipelineModel) ois.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        // Массив с категориями
+        String[] categories = {"Новая Афина", "EGAR E4", "Террасофт CRM", "ЦФТ-БАНК"};
+        // Подготовка датасета
+        final String textToClassify = "Отчет ЦФТ   Добрый день!    Просьба проверить по какой причине клиент ФИО 40817810*********** отражается в представлении по не выданным ТО, я вижу, что ТО погашен:";
+        List<Row> rows = Collections.singletonList(RowFactory.create(textToClassify));
+        StructType schema = new StructType(new StructField[]{
+                new StructField("text", DataTypes.StringType, false, Metadata.empty())
+        });
+        Dataset<Row> df = spark.createDataFrame(rows, schema);
+        df = df.withColumn("text", functions.callUDF("porterStemmer", df.col("text")));
+        model.transform(df);
+        Dataset<Row> predictions = model.transform(df);
+        predictions.show();
+        int categoryIndex = (int) predictions.select("prediction").collectAsList().get(0).getDouble(0);
+        System.out.println("Определена категория: " + categories[categoryIndex]);
+        spark.stop();
     }
 }
