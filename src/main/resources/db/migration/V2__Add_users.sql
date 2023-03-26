@@ -1,6 +1,6 @@
-insert into users (id, username, password) values
-(1, 'admin', 'admin'),
-(2, 'user', 'user');
+insert into users (username, password) values
+('admin', 'admin'),
+('user', 'user');
 
 insert into user_role (user_id, roles) values
 (1, 'ROLE_ADMIN'),

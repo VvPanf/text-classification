@@ -20,6 +20,7 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.example.utils.PorterStemmer;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
@@ -212,7 +213,6 @@ public class MainTest {
         });
         Dataset<Row> df = spark.createDataFrame(rows, schema);
         df = df.withColumn("text", functions.callUDF("porterStemmer", df.col("text")));
-        model.transform(df);
         Dataset<Row> predictions = model.transform(df);
         predictions.show();
         int categoryIndex = (int) predictions.select("prediction").collectAsList().get(0).getDouble(0);

@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 @Table(name="incidents")
 public class Incident {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotBlank
     private String title;
