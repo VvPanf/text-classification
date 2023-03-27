@@ -3,6 +3,7 @@
     --bs-success-button: #0d6efd;
 
 }
+
 * {
     margin: 0;
     padding: 0;
@@ -33,6 +34,7 @@ header {
     align-items: center;
     z-index: 99;
 }
+
 .logo {
     position: relative;
     font-size: 2em;
@@ -59,7 +61,6 @@ header {
     justify-content: space-between;
     align-items: center;
 }
-
 
 .navigation a {
     position: relative;
@@ -127,6 +128,7 @@ header {
     width: 100%;
     padding: 20px;
 }
+
 .form-box h2 {
     font-size: 3em;
 
@@ -158,6 +160,7 @@ header {
 .input-box input:focus~label{
     top: -5px;
 }
+
 .input-box input:valid~label {
     top: -5px;
 }
@@ -182,6 +185,7 @@ header {
     line-height:  57px;
 
 }
+
 .input-box .icon-help {
     position: absolute;
     right: 8px;
@@ -190,6 +194,7 @@ header {
     line-height:  5px;
 
 }
+
 .help th {
     position: absolute;
     top: 50%;
@@ -197,7 +202,6 @@ header {
     font-size: 1em;
     color: #162938;
     pointer-events: none;
-
 }
 
 .remember-forgot {
@@ -225,7 +229,6 @@ header {
     font-size: 1em;
     color: #d3f1fc;
     font-weight: 500;
-
 }
 
 
@@ -235,13 +238,12 @@ header {
     border: 2px solid #162938;
 }
 
-
 .wrapper_index {
     position: absolute;
     top: 15%;
     width: 850px;
     height: 650px;
-    background-color:  rgba(255, 255, 255, 0.9);
+    background-color:  rgba(255, 255, 255, 0.8);
     border: 2px solid #d3f1fc;
     border-radius: 20px;
     backdrop-filter:  blur(20px);
@@ -269,18 +271,16 @@ header {
 }
 
 .wrapper_index .form-box-in {
-
     width: 100%;
     padding: 10px;
 }
 
 .form-box-in h2 {
-
     font-size: 2em;
     color: #162938;
     text-align: center;
-
 }
+
 .input-box-in {
     position: relative;
     width: 100%;
@@ -288,7 +288,6 @@ header {
     border-bottom: 2px solid #162938;
     margin: 20px 0;
 }
-
 
 .input-box-in input {
     width: 100%;
@@ -300,19 +299,18 @@ header {
     color: #162938;
     font-weight: 600;
     padding: 0 35px 0 5px;
-
-
 }
 
 .input-box-in .form-control:focus{
-    background: transparent;
+    background: #ffffff;
     border: 2px solid #162938;
-
-
+    outline: none;
 }
+
 .input-box-in .form-control:valid~label {
-    background: transparent;
+    background: #ffffff;
     border: 2px solid #162938;
+    outline: none;
 }
 
 .text-box-in textarea {
@@ -320,6 +318,7 @@ header {
     height: 100%;
     background: transparent;
     outline: none;
+    resize: vertical;
     font-size: 1em;
     color: #162938;
     font-weight: 600;
@@ -328,6 +327,9 @@ header {
     border-radius: 10px;
 }
 
+.text-box-in textarea:focus {
+    background-color: #ffffff;
+}
 
 .buttonSend .btn {
     width: 130px;
@@ -349,7 +351,6 @@ header {
     color: #162938;
     border: 2px solid #d3f1fc;
 }
-
 
 .bot-box {
     position: relative;
@@ -388,9 +389,7 @@ header {
     font-size: 2em;
     color: #d3f1fc;
     text-align: center;
-
 }
-
 
 .wrapper_about h3 {
     font-size: 1.5em;
@@ -413,6 +412,7 @@ header {
     align-items: center;
     overflow: hidden;
 }
+
 .wrapper_admin .icon-close {
     position: absolute;
     top: 0;
@@ -428,6 +428,7 @@ header {
     border-bottom-left-radius: 20px;
     cursor: pointer;
 }
+
 .admin_text {
     width: 100%;
     padding: 10px;
@@ -435,11 +436,9 @@ header {
 }
 
 .admin_text h2 {
-
     font-size: 2em;
     color: black;
     text-align: center;
-
 }
 
 .admin_table {
@@ -449,6 +448,26 @@ header {
     margin: 30px 0;
 }
 
+.table {
+    border-collapse: collapse;
+}
+
+.table th {
+    height: 50px;
+    padding: 5px 5px;
+    text-align: left;
+    vertical-align: bottom;
+    border-bottom: 2px solid #000000;
+}
+
+.table td {
+    padding: 10px 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+.table tr:hover {
+    background-color: rgba(255, 255, 255, 0.6);
+}
 
 .sidebar {
     position: fixed;
@@ -484,6 +503,7 @@ header {
     transition: 0.5s ease;
     border-radius: 6px;
 }
+
 .sidebar ul li a:hover {
     background: rgba(255,255,255, 0.1);
 }
@@ -529,3 +549,14 @@ header {
     cursor: pointer;
 }
 
+.alert {
+    position: relative;
+    padding: .75rem 1.25rem;
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}

@@ -5,7 +5,6 @@
         <meta charset="UTF-8">
         <title>Text Classification</title>
         <link rel="stylesheet" href="/static/style.css">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     </head>
     <body>
         <header>
@@ -20,7 +19,6 @@
                 <#if user?? && user.isAdmin()>
                     <a href="/admin">Управление инцидентами</a>
                 </#if>
-                    <a href="/about">О нас</a>
                 <#if user??>
                     <div>
                         <form action="/logout" method="POST">
@@ -40,10 +38,9 @@
 
     </header>
     <#nested>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-    <script src="static/script.js"/>
+    <script src="static/script.js"></script>
     </body>
     </html>
 </#macro>

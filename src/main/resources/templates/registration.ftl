@@ -5,7 +5,7 @@
     <form class="form" method="POST">
         <h3>Регистрация</h3>
         <#if error??>
-            <div class="alert alert-danger">
+            <div class="alert">
                 ${error}
             </div>
         </#if>

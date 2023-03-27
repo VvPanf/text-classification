@@ -30,7 +30,8 @@ public class SparkConfig {
         return new SparkConf()
                 .setAppName(appName)
                 .setMaster(masterUri)
-                .set("spark.eventLog.enabled", "false");
+                .set("spark.eventLog.enabled", "false")
+                .set("spark.ui.enabled", "false");
     }
 
     @Bean

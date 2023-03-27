@@ -8,7 +8,7 @@
         <h2>Форма для создания обращения</h2>
         <#if errors??>
             <#list errors as error>
-                <div class="alert alert-danger">
+                <div class="alert">
                     ${'Поле ' + error.field + ' ' + error.defaultMessage}
                 </div>
             </#list>

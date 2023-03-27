@@ -5,7 +5,7 @@
         <div class="form-box login">
             <h2>Авторизация</h2>
             <#if SPRING_SECURITY_LAST_EXCEPTION??>
-                <div class="alert alert-danger">
+                <div class="alert">
                     ${SPRING_SECURITY_LAST_EXCEPTION.message}
                 </div>
             </#if>
