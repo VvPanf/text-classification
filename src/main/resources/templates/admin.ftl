@@ -40,22 +40,28 @@
                     <th>Содержание запроса</th>
                     <th>Рабочая группа</th>
                     <th>Статус</th>
+                    <th>-</th>
                 </tr>
                 <#if incidents?has_content>
                     <#list incidents as incident>
                         <tr>
                             <td width="5%">${incident?counter}</td>
-                            <td width="12.5%">${incident.timestamp?string.short!""}</td>
+                            <td width="10%">${incident.timestamp?string.short!""}</td>
                             <td width="7%">${incident.user.username!""}</td>
                             <td width="12.5%">${incident.title!""}</td>
                             <td width="20%">${incident.text!""}</td>
                             <td width="10%">${incident.workGroup!""}</td>
                             <td width="10%">${incident.status!""}</td>
+                            <td width="3%">
+                                <a class="delete-btn" href="/admin?delete=${incident.id}">
+                                    <ion-icon name="close"></ion-icon>
+                                </a>
+                            </td>
                         </tr>
                     </#list>
                 <#else>
                     <tr>
-                        <td scope="row" colspan="7">Список запросов пуст</td>
+                        <td scope="row" colspan="8">Список запросов пуст</td>
                     </tr>
                 </#if>
             </table>

@@ -455,6 +455,9 @@ header {
 
 .table {
     border-collapse: collapse;
+    overflow-y: scroll;
+    height: 100%;
+    display: block;
 }
 
 .table th {
@@ -472,6 +475,11 @@ header {
 
 .table tr:hover {
     background-color: rgba(255, 255, 255, 0.6);
+}
+
+.delete-btn {
+    color: red;
+    text-decoration: 'none';
 }
 
 .sidebar {

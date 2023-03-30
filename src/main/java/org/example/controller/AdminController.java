@@ -25,7 +25,11 @@ public class AdminController {
     @GetMapping
     public String getAdmin(@AuthenticationPrincipal User user,
                            @RequestParam(required = false) String type,
+                           @RequestParam(required = false) String delete,
                            Model model) {
+        if (delete != null) {
+            incidentRepo.deleteById(Long.valueOf(delete));
+        }
         List<Incident> incidents = incidentRepo.findAll();
         String title = "Полный список";
         if (Objects.equals(type, "new")) {
