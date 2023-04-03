@@ -52,7 +52,10 @@
                             <td width="20%">${incident.text!""}</td>
                             <td width="10%">${incident.workGroup!""}</td>
                             <td width="10%">${incident.status!""}</td>
-                            <td width="3%">
+                            <td width="5%">
+                                <a class="edit-btn" href="/incident?id=${incident.id}">
+                                    <ion-icon name="pencil-outline"></ion-icon>
+                                </a>
                                 <a class="delete-btn" href="/admin?delete=${incident.id}">
                                     <ion-icon name="close"></ion-icon>
                                 </a>

@@ -331,6 +331,22 @@ header {
     background-color: #ffffff;
 }
 
+.info-box-in {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    vertical-align: center;
+}
+
+.select-box-in {
+    margin-top: 10px;
+}
+
+.select-box-in select {
+    font: inherit;
+}
+
+
 .button-box-in {
     display: flex;
     justify-content: space-between;
@@ -475,6 +491,11 @@ header {
 
 .table tr:hover {
     background-color: rgba(255, 255, 255, 0.6);
+}
+
+.edit-btn {
+    color: blue;
+    text-decoration: none;
 }
 
 .delete-btn {
