@@ -37,8 +37,8 @@ public class AdminController {
             title = "Новые заявки";
         }
         if (Objects.equals(type, "rejected")) {
-            incidents = incidents.stream().filter(incident -> "Закрыто".equals(incident.getStatus())).collect(Collectors.toList());
-            title = "Отклонённые заявки";
+            incidents = incidents.stream().filter(incident -> "Не определена".equals(incident.getWorkGroup())).collect(Collectors.toList());
+            title = "Неопределённые заявки";
         }
         model.addAttribute("incidents", incidents);
         model.addAttribute("title", title);

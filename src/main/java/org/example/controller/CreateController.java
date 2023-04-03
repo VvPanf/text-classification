@@ -29,7 +29,7 @@ public class CreateController {
 
     @GetMapping
     public String getCreate(@AuthenticationPrincipal User user,    // Информация о пользователе с формы
-                             Model model) {                         // Модель для установки в неё параметров
+                            Model model) {                         // Модель для установки в неё параметров
         model.addAttribute("user", user);
         return "create";
     }
@@ -52,8 +52,10 @@ public class CreateController {
             incident.setWorkGroup("Не определена");
             incident.setStatus("В работе");
             String incidentContent = incident.getTitle() + " " + incident.getText();
-            String workGroup = classificationService.predict(incidentContent);
-            incident.setWorkGroup(workGroup);
+            if (incident.getText().length() < 100) {
+                String workGroup = classificationService.predict(incidentContent);
+                incident.setWorkGroup(workGroup);
+            }
             incidentRepo.save(incident);
         }
         model.addAttribute("user", user);
