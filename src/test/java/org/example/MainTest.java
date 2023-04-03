@@ -169,7 +169,8 @@ public class MainTest {
                         tokenizer,
                         stopWordsRemover,
                         hashingTF,
-                        logisticRegression,
+                        naiveBayes,
+//                        logisticRegression,
 //                        indexToStringExp
                 });
         PipelineModel model = pipeline.fit(train);
@@ -184,7 +185,7 @@ public class MainTest {
         System.out.println("Test set accuracy = " + accuracy);
         // Сохранение обученной модели только с необходимыми стадиями
 //        model.save("data/model");
-        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(Paths.get("data/pipeline_model.ser")))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(Paths.get("data/bayes_model.ser")))) {
             List<Transformer> stages = Arrays.stream(model.stages()).skip(1).collect(Collectors.toList());
             PipelineModel modelToSave = new PipelineModel(UUID.randomUUID().toString(), stages);
             oos.writeObject(modelToSave);
@@ -198,7 +199,7 @@ public class MainTest {
         // Загрузка обученной модели из файла
 //        PipelineModel model = PipelineModel.load("data/model");
         PipelineModel model;
-        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(Paths.get("data/pipeline_model.ser")))) {
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(Paths.get("data/bayes_model.ser")))) {
             model = (PipelineModel) ois.readObject();
         } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
@@ -206,7 +207,7 @@ public class MainTest {
         // Массив с категориями
         String[] categories = {"Новая Афина", "EGAR E4", "Террасофт CRM", "ЦФТ-БАНК"};
         // Подготовка датасета
-        final String textToClassify = "Отчет ЦФТ   Добрый день!    Просьба проверить по какой причине клиент ФИО 40817810*********** отражается в представлении по не выданным ТО, я вижу, что ТО погашен:";
+        final String textToClassify = "Просто какая-то фигня написана, которую не надо классифицировать";
         List<Row> rows = Collections.singletonList(RowFactory.create(textToClassify));
         StructType schema = new StructType(new StructField[]{
                 new StructField("text", DataTypes.StringType, false, Metadata.empty())
@@ -216,6 +217,7 @@ public class MainTest {
         Dataset<Row> predictions = model.transform(df);
         predictions.show();
         int categoryIndex = (int) predictions.select("prediction").collectAsList().get(0).getDouble(0);
+        System.out.println("Вероятности категорий: " + predictions.select("probability").collectAsList().get(0).get(0));
         System.out.println("Определена категория: " + categories[categoryIndex]);
         spark.stop();
     }
