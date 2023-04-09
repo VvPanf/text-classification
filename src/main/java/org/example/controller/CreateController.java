@@ -52,7 +52,7 @@ public class CreateController {
             incident.setWorkGroup("Не определена");
             incident.setStatus("В работе");
             String incidentContent = incident.getTitle() + " " + incident.getText();
-            if (incident.getText().length() < 100) {
+            if (incident.getText().length() > 100) {
                 String workGroup = classificationService.predict(incidentContent);
                 incident.setWorkGroup(workGroup);
             }
