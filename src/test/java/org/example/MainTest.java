@@ -6,9 +6,7 @@ import org.apache.spark.ml.Pipeline;
 import org.apache.spark.ml.PipelineModel;
 import org.apache.spark.ml.PipelineStage;
 import org.apache.spark.ml.Transformer;
-import org.apache.spark.ml.classification.LogisticRegression;
-import org.apache.spark.ml.classification.NaiveBayes;
-import org.apache.spark.ml.classification.NaiveBayesModel;
+import org.apache.spark.ml.classification.*;
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator;
 import org.apache.spark.ml.feature.HashingTF;
 import org.apache.spark.ml.feature.StopWordsRemover;
@@ -30,10 +28,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -220,5 +215,82 @@ public class MainTest {
         System.out.println("Вероятности категорий: " + predictions.select("probability").collectAsList().get(0).get(0));
         System.out.println("Определена категория: " + categories[categoryIndex]);
         spark.stop();
+    }
+
+    @Test
+    public void most_best_model() {
+        // Количество прогонов
+        int numAttempts = 3;
+        Random rand = new Random();
+        SparkSession spark = createSparkSession();
+        Map<String, Double> results = new LinkedHashMap<>();
+        List<Classifier<?,?,?>> classifierList = new ArrayList<>();
+        // Наивный Байес
+        classifierList.add(new NaiveBayes());
+        // Логистическая регрессия
+        classifierList.add(new LogisticRegression()
+                            .setMaxIter(10)
+                            .setRegParam(0.3)
+                            .setElasticNetParam(0));
+        // Случайный лес
+        classifierList.add(new RandomForestClassifier()
+                .setNumTrees(10));
+        // Дерево решений
+        classifierList.add(new DecisionTreeClassifier());
+        // Прогоняем обучение по каждому классификатору
+        for (Classifier<?,?,?> classifier : classifierList) {
+            String classifierName = classifier.getClass().toString().substring(classifier.getClass().toString().lastIndexOf(".") + 1);
+            System.out.println("Обучаем " + classifierName);
+            for (int i=0; i<numAttempts; i++) {
+                double accuracy = learn_and_evaluate(spark, classifier, rand.nextLong());
+                results.put(i + " " + classifierName, accuracy);
+            }
+        }
+        // Выводим таблицу с результатами
+        for (Map.Entry<String, Double> entry : results.entrySet()) {
+            System.out.println(entry.toString());
+        }
+        spark.stop();
+    }
+
+    private double learn_and_evaluate(SparkSession spark, Classifier<?,?,?> classifier, long randomKey) {
+        Dataset<Row> df = spark.read().option("header", true).option("delimiter", ";").csv("src/test/resources/text-data.csv");
+        df = df.withColumn("text", functions.callUDF("porterStemmer", df.col("text")));
+        Dataset<Row>[] splits = df.randomSplit(new double[]{0.7, 0.3}, randomKey);
+        Dataset<Row> train = splits[0];
+        Dataset<Row> test = splits[1];
+
+        // Шаги по обработке данных
+        StringIndexer stringIndexer = new StringIndexer()
+                .setInputCol("category")
+                .setOutputCol("label");
+        Tokenizer tokenizer = new Tokenizer()
+                .setInputCol("text")
+                .setOutputCol("words");
+        StopWordsRemover stopWordsRemover = new StopWordsRemover()
+                .setInputCol("words")
+                .setOutputCol("cleanTokens");
+        HashingTF hashingTF = new HashingTF()
+                .setInputCol("cleanTokens")
+                .setOutputCol("features")
+                .setNumFeatures(1000);
+        // Обучаем модель
+        Pipeline pipeline = new Pipeline()
+                .setStages(new PipelineStage[]{
+                        stringIndexer,
+                        tokenizer,
+                        stopWordsRemover,
+                        hashingTF,
+                        classifier
+                });
+        PipelineModel model = pipeline.fit(train);
+        Dataset<Row> predictions = model.transform(test);
+        // Вычисление точности на тестовом наборе
+        MulticlassClassificationEvaluator evaluator = new MulticlassClassificationEvaluator()
+                .setLabelCol("label")
+                .setPredictionCol("prediction")
+                .setMetricName("accuracy");
+        // Возвращаем точность модели
+        return evaluator.evaluate(predictions);
     }
 }
