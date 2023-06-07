@@ -12,8 +12,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
@@ -37,7 +35,6 @@ public class CreateController {
     @PostMapping
     public String postCreate(@AuthenticationPrincipal User user,                    // Информация о пользователе с формы
                              @Valid Incident incident,                              // Инцедент с формы
-                             @RequestParam(required = false) MultipartFile file,    // Прикреплённый файл (если емеется)
                              BindingResult bindingResult,                           // Информация о прохождении валидации полей с формы
                              Model model) {                                         // Модель для установки в неё параметров
         if (bindingResult.hasErrors()) {
